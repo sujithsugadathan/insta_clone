@@ -21,12 +21,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String firstHalf;
+  String secondHalf;
+
+  bool flag = true;
+
   int index = 0;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +69,14 @@ class _HomePageState extends State<HomePage> {
     size,
     CommentProvider commentProvider,
   ) {
+    if (commentProvider.items[index].title.length > 50) {
+      firstHalf = commentProvider.items[index].title.substring(0, 50);
+      secondHalf = commentProvider.items[index].title
+          .substring(50, commentProvider.items[index].title.length);
+    } else {
+      firstHalf = commentProvider.items[index].title;
+      secondHalf = "";
+    }
     return ListView(
       children: [
         SingleChildScrollView(
@@ -186,8 +194,8 @@ class _HomePageState extends State<HomePage> {
                                     border:
                                         Border.all(width: 1, color: bgWhite),
                                     image: DecorationImage(
-                                        image: NetworkImage(
-                                            newFeeds[index]['profile']),
+                                        image: NetworkImage(commentProvider
+                                            .items[index].lowThumbnail),
                                         fit: BoxFit.cover)),
                               ),
                             ),
@@ -196,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                             width: 10,
                           ),
                           Text(
-                            newFeeds[index]['username'],
+                            commentProvider.items[index].channelname,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -209,7 +217,8 @@ class _HomePageState extends State<HomePage> {
                   height: 400,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: NetworkImage(newFeeds[index]['imageUrl']),
+                          image: NetworkImage(
+                              commentProvider.items[index].highThumbnail),
                           fit: BoxFit.cover)),
                 ),
                 Padding(
@@ -265,13 +274,21 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 5),
-                      Text(commentProvider.items[index].title,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
                       Text(
-                        "\n....more",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.grey),
-                        textAlign: TextAlign.left,
+                          flag ? (firstHalf + "...") : (firstHalf + secondHalf),
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            flag = !flag;
+                          });
+                        },
+                        child: Text(
+                          flag ? "more" : "less",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.grey),
+                          textAlign: TextAlign.left,
+                        ),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -322,7 +339,6 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text("🥰"),
                                 SizedBox(width: 8),
                                 Text("😎"),
                                 SizedBox(width: 8),
